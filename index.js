@@ -48,8 +48,9 @@ const actionObject = {
         const deptID = db.query(`SELECT id FROM departments WHERE dept_name = ${reponse.deptName}`, (err, results) => {
             return results;
         })
-        db.query(`INSERT INTO roles (title, salary, department_id) VALUES (?,?,?)`, [response.roleName, response.salary, deptID]), (err, results) => {
-            console.log('Role successfully added');
+        db.query(`INSERT INTO roles (title, salary, department_id) VALUES (?,?,?)`, 
+            [response.roleName, response.salary, deptID]), (err, results) => {
+                console.log('Role successfully added');
         }
     },
     'Add an Employee': async () => {
@@ -75,6 +76,13 @@ const actionObject = {
                 name: 'manager',
             }
         ])
+        const managerID = db.query(`SELECT id FROM managers WHERE dept_name = ?`, [response.manager], (err, results) => {
+            return results;
+        })
+        db.query('INSERT INTO employees (first_name, last_name, role, manager_id) VALUES (?,?,?,?)', 
+            [response.firstName, response.lastName, response.role, managerID], (err, results) => {
+                console.log('Employee successfully added')
+            })
     },
     'Update an Employee Role': ,
     'Exit' : exit()
