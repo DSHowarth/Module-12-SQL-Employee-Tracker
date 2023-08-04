@@ -19,6 +19,9 @@ const actionObject = {
                 name: 'deptName',
             }
         ])
+        db.query('INSERT INTO departments (dept_name) VALUES (?)', [response.deptName], (err, results) => {
+            console.log('Deparment added successfully');
+        })
     },
     'Add a Role': async () => {
         const deptNames = db.query({sql: 'SELECT dept_name FROM departments', rowsAsArray: true}, (err, results) => {
