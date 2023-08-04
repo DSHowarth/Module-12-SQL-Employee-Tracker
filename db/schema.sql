@@ -1,6 +1,8 @@
 DROP DATABASE Company_db;
 CREATE DATABASE Company_db;
 
+USE Company_db
+
 CREATE TABLE departments (
     id INT AUTO_INCREMENT NOT NULL,
     PRIMARY KEY (id),
