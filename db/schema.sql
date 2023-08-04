@@ -19,9 +19,9 @@ CREATE TABLE roles (
 
 CREATE TABLE employees (
     id INT AUTO_INCREMENT NOT NULL,
-    PRIMARY KEY (id)
-    first_name VARCHAR(30);
-    last_name VARCHAR(30);
+    PRIMARY KEY (id),
+    first_name VARCHAR(30),
+    last_name VARCHAR(30),
     role_id INT,
     FOREIGN KEY (role_id)
     REFERENCES roles(id),
