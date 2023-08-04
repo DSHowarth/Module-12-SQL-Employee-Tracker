@@ -20,7 +20,7 @@ const actionObject = {
             }
         ])
         db.query('INSERT INTO departments (dept_name) VALUES (?)', [response.deptName], (err, results) => {
-            console.log('Deparment added successfully');
+            console.log('Department added successfully');
         })
     },
     'Add a Role': async () => {
@@ -42,7 +42,7 @@ const actionObject = {
                 type: 'list',
                 message: 'Please select the department for this role:',
                 name: 'deptName',
-                choices: [deptNames]
+                choices: deptNames
             }
         ])
         const deptID = db.query(`SELECT id FROM departments WHERE dept_name = ${reponse.deptName}`, (err, results) => {
@@ -54,6 +54,21 @@ const actionObject = {
         }
     },
     'Add an Employee': async () => {
+        const managerNames = db.query('SELECT CONCAT(first_name, last_name) FROM employees AS fullName', (err, results) => {
+            let outputArray = []
+            for(const row in results){
+                outputArray.push(row.fullName);
+            }
+            return outputArray;
+        });
+        managerNames.unshift('None');
+        const roleTitles = db.query('SELECT title FROM roles', (err, results) => {
+            let outputArray = []
+            for(const row in results){
+                outputArray.push(row.title);
+            }
+            return outputArray;
+        });
         const response = await inquirer.prompt([
             {
                 type: 'input',
@@ -66,17 +81,21 @@ const actionObject = {
                 name: 'lastName',
             },
             {
-                type: 'input',
-                message: 'Please enter the role of the new employee:',
-                name: 'role',
+                type: 'list',
+                message: 'Please select the role of the new employee:',
+                name: roleTitles,
             },
             {
-                type: 'input',
-                message: "Please enter the name of the new employee's manager:",
+                type: 'list',
+                message: "Please select the new employee's manager:",
                 name: 'manager',
+                choices: managerNames
             }
         ])
-        const managerID = db.query(`SELECT id FROM managers WHERE dept_name = ?`, [response.manager], (err, results) => {
+        const managerID = db.query(`SELECT id FROM employees WHERE dept_name = ?`, [response.manager], (err, results) => {
+            return results;
+        })
+        const roleID = db.query(`SELECT id FROM roles WHERE title = ?`, [response.role], (err, results) => {
             return results;
         })
         db.query('INSERT INTO employees (first_name, last_name, role, manager_id) VALUES (?,?,?,?)', 
@@ -84,7 +103,7 @@ const actionObject = {
                 console.log('Employee successfully added')
             })
     },
-    'Update an Employee Role': ,
+    // 'Update an Employee Role': ,
     'Exit' : exit()
 
 }
