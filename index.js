@@ -62,7 +62,7 @@ const actionObject = {
 
         managerNames = managers[0].map(row => row['CONCAT(first_name, " ", last_name)']);
 
-        // managerNames.unshift('None');
+        managerNames.unshift('None');
         let roles = await db.promise().query('SELECT id, title FROM roles');
 
         let roleTitles = roles[0].map(row => row['title']);
@@ -92,8 +92,13 @@ const actionObject = {
                 choices: managerNames
             }
         ])
-        const managerID = managers[0].find((row) => row['CONCAT(first_name, " ", last_name)'] === response.manager).id;
-        console.log(roles);
+        let managerID;
+        if(response.manager == 'None'){
+            managerID = null;
+        }
+        else{
+            managerID = managers[0].find((row) => row['CONCAT(first_name, " ", last_name)'] === response.manager).id;
+        }
         const roleID = roles[0].find((row) => row.title === response.role).id;
         db.query('INSERT INTO employees (first_name, last_name, role_id, manager_id) VALUES (?,?,?,?)', 
             [response.firstName, response.lastName, roleID, managerID], (err, results) => {
@@ -104,7 +109,9 @@ const actionObject = {
                 console.log('Employee successfully added')
             })
     },
-    // 'Update an Employee Role': ,
+    'Update an Employee Role': async () => {
+
+    },
     'Exit' : () => {
         process.exit();
     }
