@@ -10,7 +10,7 @@ enterprise software.
 ## Installation
 
 - Download the code, open the root directory, run ```npm install```.
-- if you have mysql, run the schema file. Or create the database however you prefer.
+- Run the schema.sql file using MySQL.
 
 ## Usage
 
@@ -22,7 +22,7 @@ to make your selections, and answer the prompts if offered.
 ## Technologies Used
 
 - JavaScript
-- MySql
+- MySQL
 - Node.js
 - Inquirer.js
 - mysql2.js
