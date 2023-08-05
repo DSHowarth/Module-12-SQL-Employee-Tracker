@@ -58,9 +58,9 @@ const actionObject = {
         await db.promise().query(`INSERT INTO roles (title, salary, department_id) VALUES (?,?,?)`, [response.roleName, response.salary, deptID])
     },
     'Add an Employee': async () => {
-        let managers = await db.promise().query('SELECT id, CONCAT(first_name, last_name) FROM employees AS fullName');
+        let managers = await db.promise().query('SELECT id, CONCAT(first_name, " ", last_name) FROM employees AS fullName');
 
-        managerNames = managers[0].map(row => row['CONCAT(first_name, last_name)']);
+        managerNames = managers[0].map(row => row['CONCAT(first_name, " ", last_name)']);
 
         // managerNames.unshift('None');
         let roles = await db.promise().query('SELECT id, title FROM roles');
@@ -92,7 +92,7 @@ const actionObject = {
                 choices: managerNames
             }
         ])
-        const managerID = managers[0].find((row) => row['CONCAT(first_name, last_name)'] === response.manager).id;
+        const managerID = managers[0].find((row) => row['CONCAT(first_name, " ", last_name)'] === response.manager).id;
         console.log(roles);
         const roleID = roles[0].find((row) => row.title === response.role).id;
         db.query('INSERT INTO employees (first_name, last_name, role_id, manager_id) VALUES (?,?,?,?)', 
