@@ -34,7 +34,8 @@ const actionObject = {
         })
     },
     'Add a Role': async () => {
-        const deptNames = db.query({sql: 'SELECT dept_name FROM departments', rowsAsArray: true})
+        const depts = await db.promise().query('SELECT id, dept_name FROM departments')
+        let deptNames = depts[0].map((row) => row['dept_name'])
         const response = await inquirer.prompt([
             {
                 type: 'input',
@@ -53,11 +54,8 @@ const actionObject = {
                 choices: deptNames
             }
         ])
-        const deptID =db.query(`SELECT id FROM departments WHERE dept_name = ${reponse.deptName}`)
-        db.query(`INSERT INTO roles (title, salary, department_id) VALUES (?,?,?)`, 
-            [response.roleName, response.salary, deptID]), (err, results) => {
-                console.log('Role successfully added');
-        }
+        const deptID = depts[0].find((row) => row['dept_name'] === response.deptName).id;
+        await db.promise().query(`INSERT INTO roles (title, salary, department_id) VALUES (?,?,?)`, [response.roleName, response.salary, deptID])
     },
     'Add an Employee': async () => {
         let managers = await db.promise().query('SELECT id, CONCAT(first_name, last_name) FROM employees AS fullName');
