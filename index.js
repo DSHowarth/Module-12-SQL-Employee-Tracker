@@ -126,5 +126,8 @@ const newUserAction = async function () {
             ],
         }
     ])
+    newUserAction();
 
 }
+
+newUserAction();
