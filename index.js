@@ -14,11 +14,11 @@ const actionObject = {
         db.query(`SELECT * FROM departments`,  (err, results) => {
         console.table(results);
     })}, 
-    'View All Roles': async () => {db.query('SELECT * FROM roles', (err, results) => {
+    'View All Roles': async () => {db.query('SELECT roles.id, title, salary, departments.dept_name FROM roles LEFT JOIN departments ON roles.department_id = departments.id', (err, results) => {
         console.table(results);
     })}, 
     'View All Employees': async () => {db.query(`    
-        SELECT employees.id, employees.first_name, employees.last_name, roles.title, departments.dept_name, roles.salary, CONCAT(managers.first_name, " ", managers.last_name) AS managers
+        SELECT employees.id, employees.first_name, employees.last_name, roles.title, departments.dept_name, roles.salary, CONCAT(managers.first_name, " ", managers.last_name) AS manager
         FROM employees 
         LEFT JOIN roles ON employees.role_id = roles.id 
         LEFT JOIN departments ON roles.department_id = departments.id 
