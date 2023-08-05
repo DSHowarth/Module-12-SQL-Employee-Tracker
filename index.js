@@ -1,6 +1,5 @@
 const mysql = require('mysql2');
 const inquirer = require('inquirer');
-const { promisify } = require('util');
 
 const db = mysql.createConnection({
     host: 'localhost',
@@ -29,9 +28,7 @@ const actionObject = {
                 name: 'deptName',
             }
         ])
-        db.query('INSERT INTO departments (dept_name) VALUES (?)', [response.deptName], (err, results) => {
-            console.log('Department added successfully');
-        })
+        db.promise().query('INSERT INTO departments (dept_name) VALUES (?)', [response.deptName])
     },
     'Add a Role': async () => {
         const depts = await db.promise().query('SELECT id, dept_name FROM departments')
@@ -110,6 +107,30 @@ const actionObject = {
             })
     },
     'Update an Employee Role': async () => {
+        let employees = await db.promise().query('SELECT id, CONCAT(first_name, " ", last_name) FROM employees AS fullName');
+        let employeeNames = employees[0].map(row => row['CONCAT(first_name, " ", last_name)']);
+
+        let roles = await db.promise().query('SELECT id, title FROM roles');
+        let roleTitles = roles[0].map(row => row['title']);
+
+        const response = await inquirer.prompt([
+            {
+                type:'list',
+                message: 'Please select an employee:',
+                name: 'employee',
+                choices: employeeNames
+            },
+            {
+                type:'list',
+                message: 'Please select a new role:',
+                name: 'role',
+                choices: roleTitles
+            }
+        ])
+
+        const roleID = roles[0].find((row) => row.title === response.role).id;
+        const employeeID = employees[0].find((row) => row['CONCAT(first_name, " ", last_name)'] === response.employee).id;
+        await db.promise().query('UPDATE employees SET role_id = ? WHERE id = ?', [roleID, employeeID])
 
     },
     'Exit' : () => {
