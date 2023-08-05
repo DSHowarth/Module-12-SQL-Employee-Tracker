@@ -17,7 +17,12 @@ const actionObject = {
     'View All Roles': async () => {db.query('SELECT * FROM roles', (err, results) => {
         console.table(results);
     })}, 
-    'View All Employees': async () => {db.query('SELECT * FROM employees', (err, results) => {
+    'View All Employees': async () => {db.query(`    
+        SELECT employees.id, employees.first_name, employees.last_name, roles.title, departments.dept_name, roles.salary, CONCAT(managers.first_name, " ", managers.last_name) AS managers
+        FROM employees 
+        LEFT JOIN roles ON employees.role_id = roles.id 
+        LEFT JOIN departments ON roles.department_id = departments.id 
+        LEFT JOIN employees managers ON employees.manager_id = managers.id`, (err, results) => {
         console.table(results);
     })},
     'Add a Department': async () => {
@@ -130,7 +135,7 @@ const actionObject = {
 
         const roleID = roles[0].find((row) => row.title === response.role).id;
         const employeeID = employees[0].find((row) => row['CONCAT(first_name, " ", last_name)'] === response.employee).id;
-        await db.promise().query('UPDATE employees SET role_id = ? WHERE id = ?', [roleID, employeeID])
+        await db.promise().query('UPDATE employees SET role_id = ? WHERE id = ?', [roleID, employeeID]);
 
     },
     'Exit' : () => {
