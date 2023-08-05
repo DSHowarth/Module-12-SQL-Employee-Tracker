@@ -1,5 +1,13 @@
-const db = require('mysql2');
+const mysql = require('mysql2');
 const inquirer = require('inquirer');
+
+const db = mysql.createConnection({
+    host: 'localhost',
+    user: 'root',
+    database: 'company_db',
+    password: 'L76q7ojrTe4E$yLK',
+  });
+  
 
 const actionObject = {
     'View All Departments': db.query(`SELECT * FROM departments`,  (err, results) => {
@@ -104,7 +112,9 @@ const actionObject = {
             })
     },
     // 'Update an Employee Role': ,
-    'Exit' : exit()
+    'Exit' : () => {
+        process.exit();
+    }
 
 }
 
@@ -126,6 +136,7 @@ const newUserAction = async function () {
             ],
         }
     ])
+    await actionObject[userChoice.action];
     newUserAction();
 
 }
