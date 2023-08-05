@@ -1,5 +1,6 @@
 const mysql = require('mysql2');
 const inquirer = require('inquirer');
+const { promisify } = require('util');
 
 const db = mysql.createConnection({
     host: 'localhost',
@@ -17,7 +18,7 @@ const actionObject = {
     'View All Roles': async () => {db.query('SELECT * FROM roles', (err, results) => {
         console.table(results);
     })}, 
-    'View All Employees': async () => {db.query('SELECT * FROM employeees', (err, results) => {
+    'View All Employees': async () => {db.query('SELECT * FROM employees', (err, results) => {
         console.table(results);
     })},
     'Add a Department': async () => {
@@ -33,9 +34,7 @@ const actionObject = {
         })
     },
     'Add a Role': async () => {
-        const deptNames = db.query({sql: 'SELECT dept_name FROM departments', rowsAsArray: true}, (err, results) => {
-            return results;
-        })
+        const deptNames = db.query({sql: 'SELECT dept_name FROM departments', rowsAsArray: true})
         const response = await inquirer.prompt([
             {
                 type: 'input',
@@ -54,30 +53,20 @@ const actionObject = {
                 choices: deptNames
             }
         ])
-        const deptID =db.query(`SELECT id FROM departments WHERE dept_name = ${reponse.deptName}`, (err, results) => {
-            return results;
-        })
+        const deptID =db.query(`SELECT id FROM departments WHERE dept_name = ${reponse.deptName}`)
         db.query(`INSERT INTO roles (title, salary, department_id) VALUES (?,?,?)`, 
             [response.roleName, response.salary, deptID]), (err, results) => {
                 console.log('Role successfully added');
         }
     },
     'Add an Employee': async () => {
-        const managerNames = db.query('SELECT CONCAT(first_name, last_name) FROM employees AS fullName', (err, results) => {
-            let outputArray = []
-            for(const row in results){
-                outputArray.push(row.fullName);
-            }
-            return outputArray;
-        });
-        managerNames.unshift('None');
-        const roleTitles = db.query('SELECT title FROM roles', (err, results) => {
-            let outputArray = []
-            for(const row in results){
-                outputArray.push(row.title);
-            }
-            return outputArray;
-        });
+        let managerNames = await db.promise().query('SELECT id, CONCAT(first_name, last_name) FROM employees AS fullName');
+        managerNames = managerNames[0].map(a => a['CONCAT(first_name, last_name)']);
+        // managerNames.unshift('None');
+        let roleTitles = await db.promise().query('SELECT title FROM roles');
+        roleTitles = roleTitles[0].map(a => a['title']);
+
+
         const response = await inquirer.prompt([
             {
                 type: 'input',
@@ -92,7 +81,8 @@ const actionObject = {
             {
                 type: 'list',
                 message: 'Please select the role of the new employee:',
-                name: roleTitles,
+                name: 'role',
+                choices: roleTitles
             },
             {
                 type: 'list',
@@ -101,12 +91,8 @@ const actionObject = {
                 choices: managerNames
             }
         ])
-        const managerID = db.query(`SELECT id FROM employees WHERE dept_name = ?`, [response.manager], (err, results) => {
-            return results;
-        })
-        const roleID = db.query(`SELECT id FROM roles WHERE title = ?`, [response.role], (err, results) => {
-            return results;
-        })
+        const managerID = db.query(`SELECT id FROM employees WHERE dept_name = ?`, [response.manager]);
+        const roleID = db.query(`SELECT id FROM roles WHERE title = ?`, [response.role]);
         db.query('INSERT INTO employees (first_name, last_name, role, manager_id) VALUES (?,?,?,?)', 
             [response.firstName, response.lastName, response.role, managerID], (err, results) => {
                 console.log('Employee successfully added')
