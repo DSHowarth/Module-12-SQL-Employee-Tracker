@@ -17,7 +17,7 @@ enterprise software.
 From the root directory, start the program via ```node index.js```. Use the arrow keys
 to make your selections, and answer the prompts if offered. 
 
-![Video demonstration of features](https://drive.google.com/file/d/1T2uffOE0NePGpus3kL0xRriMWCGXggEx/view?usp=sharing)
+[Video demonstration of features](https://drive.google.com/file/d/1T2uffOE0NePGpus3kL0xRriMWCGXggEx/view?usp=sharing)
 
 ## Technologies Used
 
