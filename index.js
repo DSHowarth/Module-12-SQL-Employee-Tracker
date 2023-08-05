@@ -10,15 +10,16 @@ const db = mysql.createConnection({
   
 
 const actionObject = {
-    'View All Departments': db.query(`SELECT * FROM departments`,  (err, results) => {
+    'View All Departments': async () => { 
+        db.query(`SELECT * FROM departments`,  (err, results) => {
         console.table(results);
-    }), 
-    'View All Roles': db.query('SELECT * FROM roles', (err, results) => {
+    })}, 
+    'View All Roles': async () => {db.query('SELECT * FROM roles', (err, results) => {
         console.table(results);
-    }), 
-    'View All Employees': db.query('SELECT * FROM employeees', (err, results) => {
+    })}, 
+    'View All Employees': async () => {db.query('SELECT * FROM employeees', (err, results) => {
         console.table(results);
-    }),
+    })},
     'Add a Department': async () => {
         const response = await inquirer.prompt([
             {
@@ -53,7 +54,7 @@ const actionObject = {
                 choices: deptNames
             }
         ])
-        const deptID = db.query(`SELECT id FROM departments WHERE dept_name = ${reponse.deptName}`, (err, results) => {
+        const deptID =db.query(`SELECT id FROM departments WHERE dept_name = ${reponse.deptName}`, (err, results) => {
             return results;
         })
         db.query(`INSERT INTO roles (title, salary, department_id) VALUES (?,?,?)`, 
@@ -136,8 +137,11 @@ const newUserAction = async function () {
             ],
         }
     ])
-    await actionObject[userChoice.action];
-    newUserAction();
+    await actionObject[userChoice.action]();
+    setTimeout(() => {
+        newUserAction();
+    }, 1000);
+    
 
 }
 
