@@ -60,11 +60,14 @@ const actionObject = {
         }
     },
     'Add an Employee': async () => {
-        let managerNames = await db.promise().query('SELECT id, CONCAT(first_name, last_name) FROM employees AS fullName');
-        managerNames = managerNames[0].map(a => a['CONCAT(first_name, last_name)']);
+        let managers = await db.promise().query('SELECT id, CONCAT(first_name, last_name) FROM employees AS fullName');
+
+        managerNames = managers[0].map(row => row['CONCAT(first_name, last_name)']);
+
         // managerNames.unshift('None');
-        let roleTitles = await db.promise().query('SELECT title FROM roles');
-        roleTitles = roleTitles[0].map(a => a['title']);
+        let roles = await db.promise().query('SELECT id, title FROM roles');
+
+        let roleTitles = roles[0].map(row => row['title']);
 
 
         const response = await inquirer.prompt([
@@ -91,10 +94,15 @@ const actionObject = {
                 choices: managerNames
             }
         ])
-        const managerID = db.query(`SELECT id FROM employees WHERE dept_name = ?`, [response.manager]);
-        const roleID = db.query(`SELECT id FROM roles WHERE title = ?`, [response.role]);
-        db.query('INSERT INTO employees (first_name, last_name, role, manager_id) VALUES (?,?,?,?)', 
-            [response.firstName, response.lastName, response.role, managerID], (err, results) => {
+        const managerID = managers[0].find((row) => row['CONCAT(first_name, last_name)'] === response.manager).id;
+        console.log(roles);
+        const roleID = roles[0].find((row) => row.title === response.role).id;
+        db.query('INSERT INTO employees (first_name, last_name, role_id, manager_id) VALUES (?,?,?,?)', 
+            [response.firstName, response.lastName, roleID, managerID], (err, results) => {
+                if(err) {
+                    console.log(err);
+                    return;
+                }
                 console.log('Employee successfully added')
             })
     },
