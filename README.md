@@ -11,6 +11,7 @@ enterprise software.
 
 - Download the code, open the root directory, run ```npm install```.
 - Run the schema.sql file using MySQL.
+- Replace the 'password' value on line 9 of actions.js with your MySQL password.
 
 ## Usage
 
